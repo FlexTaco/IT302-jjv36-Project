@@ -1,3 +1,9 @@
+//joffre villacis
+//oct 6, 2024
+//it302, section 451
+//phase 2
+//jjv36@njit.edu
+
 import JobsDAO from "../dao/jobsDAO.js";
 
 export default class JobsController {
@@ -10,10 +16,10 @@ export default class JobsController {
 
     let filters = {};
 
-    if (req.query.rated) {
-      filters.rated = req.query.rated;
-    } else if (req.query.title) {
-      filters.title = req.query.title;
+    if (req.query.id) {
+      filters.id = req.query.id;
+    } else if (req.query.companyName) {
+      filters.companyName = req.query.companyName;
     }
 
     const { jobsList, totalNumJobs } = await JobsDAO.getJobs({

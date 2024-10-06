@@ -1,3 +1,8 @@
+//joffre villacis
+//oct 6, 2024
+//it302, section 451
+//phase 2
+//jjv36@njit.edu
 let jobs;
 
 export default class JobsDAO {
@@ -7,6 +12,7 @@ export default class JobsDAO {
     }
     try {
       jobs = await conn.db(process.env.JOBS_NS).collection("RemoteJobs_jjv36");
+      await jobs.createIndex({ companyName: "text" });
     } catch (e) {
       console.error(`unable to connect in JobsDAO: ${e}`);
     }
@@ -15,10 +21,10 @@ export default class JobsDAO {
   static async getJobs({ filters = null, page = 0, jobsPerPage = 20 } = {}) {
     let query;
     if (filters) {
-      if ("jobTitle" in filters) {
-        query = { $text: { $search: filters["jobTitle"] } };
-      } else if ("jobType" in filters) {
-        query = { jobType: { $eq: filters["jobType"] } };
+      if ("companyName" in filters) {
+        query = { $text: { $search: filters["companyName"] } };
+      } else if ("id" in filters) {
+        query = { id: { $eq: filters["id"] } };
       }
     }
 
