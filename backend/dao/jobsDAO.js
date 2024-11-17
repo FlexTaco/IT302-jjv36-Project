@@ -1,5 +1,5 @@
 //joffre villacis
-//oct 18, 2024
+//oct 20, 2024
 //it302, section 451
 //phase 3
 //jjv36@njit.edu
@@ -24,8 +24,8 @@ export default class JobsDAO {
     if (filters) {
       if ("companyName" in filters) {
         query = { $text: { $search: filters["companyName"] } };
-      } else if ("id" in filters) {
-        query = { id: { $eq: filters["id"] } };
+      } else if ("jobGeo" in filters) {
+        query = { jobGeo: { $eq: filters["jobGeo"] } };
       }
     }
 
@@ -94,8 +94,27 @@ export default class JobsDAO {
       return { error: err.message };
     }
   }
-}
 
+  static async getLocations() {
+    let location = [];
+    try {
+      location = await jobs.distinct("jobGeo");
+      return location;
+    } catch (e) {
+      console.error(`unable to get location, ${e}`);
+      return location;
+    }
+  }
+
+  static async getJobById(id) {
+    try {
+      return await jobs.find({ _id: new ObjectId(id) }).toArray();
+    } catch (e) {
+      console.error(`something went wrong in getJobById: ${e}`);
+      throw e;
+    }
+  }
+}
 // post
 // {
 //   "id": 110644,

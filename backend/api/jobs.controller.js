@@ -1,5 +1,5 @@
 //joffre villacis
-//oct 18, 2024
+//oct 20, 2024
 //it302, section 451
 //phase 3
 //jjv36@njit.edu
@@ -15,8 +15,8 @@ export default class JobsController {
 
     let filters = {};
 
-    if (req.query.id) {
-      filters.id = req.query.id;
+    if (req.query.jobGeo) {
+      filters.jobGeo = req.query.jobGeo;
     } else if (req.query.companyName) {
       filters.companyName = req.query.companyName;
     }
@@ -36,6 +36,21 @@ export default class JobsController {
     };
 
     res.json(response);
+  }
+
+  static async apiGetJobsById(req, res, next) {
+    try {
+      let id = req.params.id || {};
+      let job = await JobsDAO.getJobById(id);
+      if (!job) {
+        res.status(404).json({ error: "not found" });
+        return;
+      }
+      res.json(job);
+    } catch (e) {
+      console.log(`api, ${e}`);
+      res.status(500).json({ error: e });
+    }
   }
 
   static async apiPostJobs(req, res, next) {
@@ -72,6 +87,16 @@ export default class JobsController {
       res.json(deleteResponse);
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async apiGetLocations(req, res, next) {
+    try {
+      let propertyTypes = await JobsDAO.getLocations();
+      res.json(propertyTypes);
+    } catch (e) {
+      console.log(`api, ${e}`);
+      res.status(500).json({ error: e });
     }
   }
 }
