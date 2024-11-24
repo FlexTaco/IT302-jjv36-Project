@@ -1,9 +1,15 @@
+//joffre villacis
+//nov 23, 2024
+//it302, section 451
+//phase 5
+//jjv36@njit.edu
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Card, Col, Row, Container, Image } from "react-bootstrap";
 import JobsDataService from "../service/jobsDataService";
+import Button from "react-bootstrap/Button";
 
-const Jobs = () => {
+const Jobs = (props) => {
   const [job, setJob] = useState({
     id: null,
     jobTitle: "",
@@ -17,27 +23,40 @@ const Jobs = () => {
     jobIndustry: [],
     jobType: [],
     pubDate: "",
+    comments: [],
   });
 
   const { id } = useParams();
 
-  useEffect(() => {
-    const retrieveJob = async () => {
-      try {
-        const response = await JobsDataService.get(id);
-        const jobData = response.data[0];
-        setJob(jobData);
-      } catch (error) {
-        console.error("Error fetching job:", error);
-      }
-    };
+  const getJob = (id) => {
+    JobsDataService.get(id)
+      .then((response) => {
+        setJob(response.data);
+        console.log(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
-    if (id) {
-      retrieveJob();
-    }
+  useEffect(() => {
+    getJob(id);
   }, [id]);
 
-  console.log(job);
+  const deleteComment = (commentId, index) => {
+    JobsDataService.deleteComment(commentId, props.user.id)
+      .then((response) => {
+        setJob((prevState) => {
+          prevState.comments.splice(index, 1);
+          return {
+            ...prevState,
+          };
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   return (
     <div className="p-4">
@@ -107,6 +126,53 @@ const Jobs = () => {
                 )}
               </Card.Body>
             </Card>
+            <br></br>
+            <h2>Comments</h2>
+            <br></br>
+            <Card>
+              <Card.Header as="h5">{job.title}</Card.Header>
+              <Card.Body>
+                <Card.Text>{job.jobType}</Card.Text>
+                {props.user && (
+                  <Link to={"/jjv36_jobs/" + id + "/comment"}>Add Review</Link>
+                )}
+              </Card.Body>
+            </Card>
+
+            {job.comments.map((comment, index) => {
+              return (
+                <Card key={index}>
+                  <Card.Body>
+                    <h5>
+                      {comment.name +
+                        " commented on " +
+                        new Date(Date.parse(comment.date)).toDateString()}
+                    </h5>
+                    <p>{comment.comment}</p>
+                    {props.user && props.user.id === comment.user_id && (
+                      <Row>
+                        <Col>
+                          <Link
+                            to={"/jjv36_jobs/" + id + "/comment"}
+                            state={{ currentComment: comment }}
+                          >
+                            Edit
+                          </Link>
+                        </Col>
+                        <Col>
+                          <Button
+                            variant="link"
+                            onClick={() => deleteComment(comment._id, index)}
+                          >
+                            Delete
+                          </Button>
+                        </Col>
+                      </Row>
+                    )}
+                  </Card.Body>
+                </Card>
+              );
+            })}
           </Col>
         </Row>
       </Container>

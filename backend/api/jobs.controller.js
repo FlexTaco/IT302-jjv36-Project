@@ -53,43 +53,6 @@ export default class JobsController {
     }
   }
 
-  static async apiPostJobs(req, res, next) {
-    try {
-      const job = req.body;
-      const addResponse = await JobsDAO.addJobs(job);
-      res.json(addResponse);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  }
-
-  static async apiUpdateJob(req, res, next) {
-    try {
-      const job = req.body;
-      const updateResponse = await JobsDAO.updateJob(job);
-      var { error } = updateResponse;
-      if (error) {
-        res.status(500).json({ error });
-      }
-      if (updateResponse.modifiedCount === 0) {
-        throw new Error("unable to update job.");
-      }
-      res.json(updateResponse);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  }
-
-  static async apiDeleteJob(req, res, next) {
-    try {
-      const job = req.body;
-      const deleteResponse = await JobsDAO.deleteJob(job);
-      res.json(deleteResponse);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  }
-
   static async apiGetLocations(req, res, next) {
     try {
       let propertyTypes = await JobsDAO.getLocations();

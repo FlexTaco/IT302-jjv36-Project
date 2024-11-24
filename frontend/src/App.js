@@ -1,16 +1,27 @@
+//joffre villacis
+//nov 18, 2024
+//it302, section 451
+//phase 4
+//jjv36@njit.edu
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Route, Routes, NavLink } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import AddReview from "./components/addReview";
+import AddComment from "./components/addComment";
 import JobsList from "./components/jobsList";
 import Jobs from "./components/jobs";
-// import Login from "./components/login";
+import Login from "./components/login";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
 function App() {
   const [user, setUser] = useState(null);
+  const loginSetter = useCallback(
+    (user) => {
+      setUser(user);
+    },
+    [setUser]
+  );
 
   async function login(user = null) {
     setUser(user);
@@ -19,7 +30,6 @@ function App() {
   async function logout() {
     setUser(null);
   }
-
   return (
     <div className="App">
       <Navbar expand="lg" className="bg-body-tertiary" bg="light">
@@ -30,7 +40,7 @@ function App() {
             <Nav.Link as={NavLink} to={"/jjv36_jobs"}>
               Jobs
             </Nav.Link>
-            <Nav.Link as={NavLink} to={user ? "" : "/login"}>
+            <Nav.Link as={NavLink} to={user ? "" : "/jjv36_login"}>
               {user ? "Logout User" : "Login"}
             </Nav.Link>
           </Nav>
@@ -40,6 +50,15 @@ function App() {
         <Route path="/" element={<JobsList />}></Route>
         <Route path="/jjv36_jobs" element={<JobsList />}></Route>
         <Route path="/jjv36_jobs/:id/" element={<Jobs user={user} />}></Route>
+        <Route
+          path="/jjv36_jobs/:id/comment"
+          element={<AddComment user={user} />}
+        ></Route>
+
+        <Route
+          path="/jjv36_login"
+          element={<Login user={user} loginSetter={loginSetter}></Login>}
+        ></Route>
       </Routes>
     </div>
   );

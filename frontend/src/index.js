@@ -1,3 +1,8 @@
+//joffre villacis
+//nov 18, 2024
+//it302, section 451
+//phase 4
+//jjv36@njit.edu
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";

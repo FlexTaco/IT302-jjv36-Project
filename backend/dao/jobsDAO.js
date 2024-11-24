@@ -45,56 +45,6 @@ export default class JobsDAO {
     }
   }
 
-  static async addJobs(job) {
-    try {
-      const jobInfo = {
-        id: job.id,
-        jobTitle: job.jobTitle,
-        companyName: job.companyName,
-        jobDescription: job.jobDescription,
-        _id: ObjectId.createFromHexString(job._id),
-        lastModified: new Date(),
-      };
-      return await jobs.insertOne(jobInfo);
-    } catch (err) {
-      console.error(`unable to post job: ${err}`);
-      return { error: err };
-    }
-  }
-
-  static async updateJob(job) {
-    try {
-      const updateJob = await jobs.updateOne(
-        { id: job.id, _id: ObjectId.createFromHexString(job._id) },
-        {
-          $set: {
-            jobTitle: job.jobTitle,
-            companyName: job.companyName,
-            jobDescription: job.jobDescription,
-            lastModified: new Date(),
-          },
-        }
-      );
-      return updateJob;
-    } catch (err) {
-      console.error(`unable to update job: ${err}`);
-      return { error: err.message };
-    }
-  }
-
-  static async deleteJob(job) {
-    try {
-      const deleteResponse = await jobs.deleteOne({
-        _id: ObjectId.createFromHexString(job._id),
-        id: job.id,
-      });
-      return deleteResponse;
-    } catch (err) {
-      console.error(`unable to delete job: ${err}`);
-      return { error: err.message };
-    }
-  }
-
   static async getLocations() {
     let location = [];
     try {
@@ -105,10 +55,25 @@ export default class JobsDAO {
       return location;
     }
   }
-
   static async getJobById(id) {
     try {
-      return await jobs.find({ _id: new ObjectId(id) }).toArray();
+      return await jobs
+        .aggregate([
+          {
+            $match: {
+              _id: new ObjectId(id),
+            },
+          },
+          {
+            $lookup: {
+              from: "comments",
+              localField: "_id",
+              foreignField: "job_id",
+              as: "comments",
+            },
+          },
+        ])
+        .next();
     } catch (e) {
       console.error(`something went wrong in getJobById: ${e}`);
       throw e;
